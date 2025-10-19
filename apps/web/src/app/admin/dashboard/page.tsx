@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { 
-  Users, 
-  Package, 
-  ShoppingCart, 
+import {
+  Users,
+  Package,
+  ShoppingCart,
   DollarSign,
   TrendingUp,
   Star,
@@ -145,9 +145,8 @@ export default function AdminDashboard() {
                   <p className="text-sm font-medium text-gray-500">{stat.name}</p>
                   <div className="flex items-center">
                     <p className="text-2xl font-semibold text-gray-900">{stat.value}</p>
-                    <span className={`ml-2 text-sm font-medium ${
-                      stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-                    }`}>
+                    <span className={`ml-2 text-sm font-medium ${stat.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
+                      }`}>
                       {stat.change}
                     </span>
                   </div>
