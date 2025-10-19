@@ -1,4 +1,4 @@
-# EcommercePro - Professional E-commerce Marketplace
+# Bharat-Sanchaya - Professional E-commerce Marketplace
 
 A modern, AI-powered multi-vendor e-commerce marketplace built with Next.js, Express.js, and MySQL. This project implements a complete e-commerce solution with secure payments, smart recommendations, and a professional user interface.
 
@@ -193,7 +193,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Om Dhabe**
 - GitHub: [@om-dhabe](https://github.com/om-dhabe)
-- Project: [EcommercePro](https://github.com/om-dhabe/ecommerce-website)
+- Project: [Bharat-Sanchaya](https://github.com/om-dhabe/ecommerce-website)
 
 ## 🙏 Acknowledgments
 

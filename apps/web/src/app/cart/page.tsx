@@ -24,14 +24,18 @@ export default function CartPage() {
   if (items.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="container py-16">
-          <div className="text-center">
-            <ShoppingBag className="w-24 h-24 text-gray-400 mx-auto mb-6" />
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
-            <p className="text-gray-600 mb-8">Looks like you haven't added any items to your cart yet.</p>
+        <div className="container py-8 sm:py-16">
+          <div className="text-center fade-in">
+            <div className="bg-gray-100 rounded-full w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center mx-auto mb-6 scale-on-hover">
+              <ShoppingBag className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">Your Cart is Empty</h1>
+            <p className="text-gray-600 mb-8 text-sm sm:text-base max-w-md mx-auto">
+              Looks like you haven't added any items to your cart yet. Start shopping to fill it up!
+            </p>
             <Link
               href="/"
-              className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors duration-200"
+              className="btn-primary inline-flex items-center px-6 py-3"
             >
               Continue Shopping
             </Link>

@@ -16,6 +16,13 @@
   --ring: 220 70% 50%;
   --background: 0 0% 100%;
   --foreground: 220.9 39.3% 11%;
+  
+  /* Animation variables */
+  --animation-duration-fast: 150ms;
+  --animation-duration-normal: 200ms;
+  --animation-duration-slow: 300ms;
+  --animation-easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --animation-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,31 +45,577 @@
   }
 }
 
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 * {
   border-color: hsl(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   color: hsl(var(--foreground));
   background: hsl(var(--background));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Responsive container with proper breakpoints */
 .container {
-  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  @apply w-full mx-auto px-4;
+  max-width: 100%;
 }
 
+@media (min-width: 640px) {
+  .container {
+    @apply px-6;
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    @apply px-8;
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1400px;
+  }
+}
+
+/* Professional button animations */
 .btn-primary {
-  @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  @apply bg-blue-600 text-white font-medium py-2 px-4 rounded-lg relative overflow-hidden;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+  transform: translateY(0);
+}
+
+.btn-primary:hover {
+  @apply bg-blue-700;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  transition-duration: var(--animation-duration-fast);
 }
 
 .btn-secondary {
-  @apply bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  @apply bg-gray-200 text-gray-900 font-medium py-2 px-4 rounded-lg;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+  transform: translateY(0);
 }
 
+.btn-secondary:hover {
+  @apply bg-gray-300;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Card animations */
 .card {
   @apply bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+  transform: translateY(0);
 }
 
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Input animations */
 .input {
-  @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  @apply w-full px-3 py-2 border border-gray-300 rounded-lg;
+  transition: all var(--animation-duration-normal) var(--animation-easing);
+}
+
+.input:focus {
+  @apply outline-none ring-2 ring-blue-500 border-transparent;
+  transform: scale(1.01);
+}
+
+/* Skeleton loading animation */
+.skeleton {
+  @apply bg-gray-200 rounded;
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Fade in animation for page transitions */
+.fade-in {
+  animation: fadeIn var(--animation-duration-slow) var(--animation-easing) forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Slide up animation */
+.slide-up {
+  animation: slideUp var(--animation-duration-slow) var(--animation-easing) forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Scale animation for interactive elements */
+.scale-on-hover {
+  transition: transform var(--animation-duration-normal) var(--animation-easing);
+}
+
+.scale-on-hover:hover {
+  transform: scale(1.05);
+}
+
+/* Bounce animation for buttons */
+.bounce-on-click {
+  transition: transform var(--animation-duration-fast) var(--animation-easing-bounce);
+}
+
+.bounce-on-click:active {
+  transform: scale(0.95);
+}
+
+/* Mobile-first responsive utilities */
+.mobile-menu {
+  transform: translateX(-100%);
+  transition: transform var(--animation-duration-normal) var(--animation-easing);
+}
+
+.mobile-menu.open {
+  transform: translateX(0);
+}
+
+/* Touch-friendly sizing for mobile */
+@media (max-width: 768px) {
+  .btn-primary,
+  .btn-secondary {
+    @apply py-3 px-6 text-base;
+    min-height: 44px; /* iOS recommended touch target */
+  }
+  
+  .input {
+    @apply py-3 text-base;
+    min-height: 44px;
+  }
+}
+
+/* Large screen optimizations */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1600px;
+  }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+}
+
+/* Focus styles for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+/* Loading spinner */
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Stagger animation for lists */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: staggerIn var(--animation-duration-slow) var(--animation-easing) forwards;
+}
+
+.stagger-item:nth-child(1) { animation-delay: 0ms; }
+.stagger-item:nth-child(2) { animation-delay: 100ms; }
+.stagger-item:nth-child(3) { animation-delay: 200ms; }
+.stagger-item:nth-child(4) { animation-delay: 300ms; }
+.stagger-item:nth-child(5) { animation-delay: 400ms; }
+.stagger-item:nth-child(6) { animation-delay: 500ms; }
+
+@keyframes staggerIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}/* Addit
+ional responsive utilities */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Line clamp utilities */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Custom breakpoint for extra small screens */
+@media (min-width: 475px) {
+  .xs\:flex {
+    display: flex;
+  }
+  
+  .xs\:hidden {
+    display: none;
+  }
+  
+  .xs\:block {
+    display: block;
+  }
+  
+  .xs\:inline {
+    display: inline;
+  }
+}
+
+/* Safe area insets for mobile devices */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  
+  .safe-bottom {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+  
+  .safe-left {
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+  
+  .safe-right {
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
+
+/* Improved touch targets for mobile */
+@media (max-width: 768px) {
+  button, 
+  a,
+  [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Better focus indicators */
+.focus-visible:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Improved button states */
+.btn-primary:focus-visible {
+  outline: 2px solid white;
+  outline-offset: 2px;
+}
+
+.btn-secondary:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Loading states */
+.loading-dots::after {
+  content: '';
+  animation: loading-dots 1.5s infinite;
+}
+
+@keyframes loading-dots {
+  0%, 20% {
+    content: '';
+  }
+  40% {
+    content: '.';
+  }
+  60% {
+    content: '..';
+  }
+  80%, 100% {
+    content: '...';
+  }
+}
+
+/* Pulse animation for notifications */
+.pulse-notification {
+  animation: pulse-notification 2s infinite;
+}
+
+@keyframes pulse-notification {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+/* Slide in from bottom animation */
+.slide-in-bottom {
+  animation: slideInBottom var(--animation-duration-slow) var(--animation-easing) forwards;
+}
+
+@keyframes slideInBottom {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Zoom in animation */
+.zoom-in {
+  animation: zoomIn var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Improved mobile menu animation */
+.mobile-menu-item {
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: mobileMenuSlide var(--animation-duration-normal) var(--animation-easing) forwards;
+}
+
+@keyframes mobileMenuSlide {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Better image loading */
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity var(--animation-duration-normal) var(--animation-easing);
+}
+
+img[loading="lazy"].loaded {
+  opacity: 1;
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a, a:visited {
+    text-decoration: underline;
+  }
+  
+  .container {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .card {
+    border: 2px solid;
+  }
+  
+  .btn-primary {
+    border: 2px solid;
+  }
+  
+  .btn-secondary {
+    border: 2px solid;
+  }
+}
+
+/* Reduced transparency for better accessibility */
+@media (prefers-reduced-transparency: reduce) {
+  .bg-white\/80,
+  .bg-black\/40,
+  .bg-white\/20 {
+    background-color: rgb(255 255 255);
+  }
+}
+/*
+ Smooth horizontal scrolling */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for horizontal containers */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Gradient overlays for scrollable containers */
+.gradient-overlay-left {
+  background: linear-gradient(to right, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+.gradient-overlay-right {
+  background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0));
+}
+
+/* Better card hover effects */
+.card-hover-lift {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Improved product card animations */
+.product-card {
+  transition: all 0.3s ease;
+  transform: translateY(0);
+}
+
+.product-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-image {
+  transition: transform 0.3s ease;
 }

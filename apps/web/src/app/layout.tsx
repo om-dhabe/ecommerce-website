@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EcommercePro - Your Premium Marketplace",
+  title: "Bharat-Sanchaya - Your Premium Marketplace",
   description: "AI-powered multi-vendor e-commerce marketplace with secure payments and smart recommendations",
   keywords: "ecommerce, marketplace, online shopping, AI recommendations",
 };

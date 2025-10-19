@@ -7,7 +7,7 @@ export default function AboutPage() {
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="container">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl font-bold mb-6">About EcommercePro</h1>
+            <h1 className="text-5xl font-bold mb-6">About Bharat-Sanchaya</h1>
             <p className="text-xl text-blue-100 mb-8">
               Your trusted marketplace connecting millions of customers with verified vendors worldwide
             </p>
@@ -21,7 +21,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Our Mission</h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              At EcommercePro, we're revolutionizing online shopping by creating a secure, AI-powered marketplace 
+              At Bharat-Sanchaya, we're revolutionizing online shopping by creating a secure, AI-powered marketplace 
               that connects customers with quality products from trusted vendors around the world. Our mission is 
               to make online shopping safer, smarter, and more personalized for everyone.
             </p>
@@ -32,7 +32,7 @@ export default function AboutPage() {
       {/* Features Section */}
       <section className="py-16 bg-white">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Why Choose EcommercePro?</h2>
+          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">Why Choose Bharat-Sanchaya?</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="text-center">
               <div className="bg-blue-100 p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
@@ -96,7 +96,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Our Story</h2>
             <p className="text-lg text-gray-600 leading-relaxed mb-8">
-              Founded in 2024, EcommercePro started with a simple vision: to create the most trusted and 
+              Founded in 2024, Bharat-Sanchaya started with a simple vision: to create the most trusted and 
               user-friendly e-commerce platform in the world. Our team of experienced developers, designers, 
               and business experts work tirelessly to bring you the best online shopping experience.
             </p>

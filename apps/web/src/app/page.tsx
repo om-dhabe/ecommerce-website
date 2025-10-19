@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { fetchProductsStart, fetchProductsSuccess, fetchProductsFailure } from "@/store/slices/productsSlice";
 import { fetchProducts } from "@/lib/api";
@@ -34,34 +35,46 @@ export default function HomePage() {
       <HeroSection />
 
       {/* Featured Categories */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-12">Shop by Category</h2>
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-8 sm:mb-12 fade-in">
+            Shop by Category
+          </h2>
           <FeaturedCategories />
         </div>
       </section>
 
       {/* Trending Products */}
-      <section className="py-16">
+      <section className="py-8 sm:py-12 lg:py-16">
         <div className="container">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Trending Now</h2>
-            <button className="text-blue-600 hover:text-blue-700 font-medium">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold slide-up">
+              Trending Now
+            </h2>
+            <Link
+              href="/categories/all"
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 scale-on-hover text-sm sm:text-base"
+            >
               View All →
-            </button>
+            </Link>
           </div>
-          <TrendingProducts products={products.slice(0, 4)} loading={loading} />
+          <TrendingProducts products={products.slice(0, 8)} loading={loading} />
         </div>
       </section>
 
       {/* Featured Products */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
         <div className="container">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold">Featured Products</h2>
-            <button className="text-blue-600 hover:text-blue-700 font-medium">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold slide-up">
+              Featured Products
+            </h2>
+            <Link
+              href="/categories/all"
+              className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 scale-on-hover text-sm sm:text-base"
+            >
               View All →
-            </button>
+            </Link>
           </div>
           <ProductGrid products={products} loading={loading} />
         </div>

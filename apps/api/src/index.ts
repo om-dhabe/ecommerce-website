@@ -137,6 +137,108 @@ app.get("/products/:id", async (req, res) => {
   }
 });
 
+// Admin/CMS endpoints
+app.post("/admin/products", async (req, res) => {
+  try {
+    const { title, description, price, category, image, inStock } = req.body;
+    
+    // Validate required fields
+    if (!title || !description || !price || !category || !image) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Create new product (in real app, this would save to database)
+    const newProduct = {
+      id: mockProducts.length + 1,
+      title,
+      description,
+      price: parseFloat(price),
+      category,
+      image,
+      inStock: inStock !== false,
+      rating: 4.5,
+      reviews: 0,
+    };
+
+    mockProducts.push(newProduct);
+    res.status(201).json(newProduct);
+  } catch (error) {
+    console.error("Error creating product:", error);
+    res.status(500).json({ error: "Failed to create product" });
+  }
+});
+
+app.put("/admin/products/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { title, description, price, category, image, inStock } = req.body;
+    
+    const productIndex = mockProducts.findIndex(p => p.id === id);
+    if (productIndex === -1) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    // Update product
+    mockProducts[productIndex] = {
+      ...mockProducts[productIndex],
+      title: title || mockProducts[productIndex].title,
+      description: description || mockProducts[productIndex].description,
+      price: price ? parseFloat(price) : mockProducts[productIndex].price,
+      category: category || mockProducts[productIndex].category,
+      image: image || mockProducts[productIndex].image,
+      inStock: inStock !== undefined ? inStock : mockProducts[productIndex].inStock,
+    };
+
+    res.json(mockProducts[productIndex]);
+  } catch (error) {
+    console.error("Error updating product:", error);
+    res.status(500).json({ error: "Failed to update product" });
+  }
+});
+
+app.delete("/admin/products/:id", async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const productIndex = mockProducts.findIndex(p => p.id === id);
+    
+    if (productIndex === -1) {
+      return res.status(404).json({ error: "Product not found" });
+    }
+
+    const deletedProduct = mockProducts.splice(productIndex, 1)[0];
+    res.json({ message: "Product deleted successfully", product: deletedProduct });
+  } catch (error) {
+    console.error("Error deleting product:", error);
+    res.status(500).json({ error: "Failed to delete product" });
+  }
+});
+
+// Dashboard stats endpoint
+app.get("/admin/stats", async (_req, res) => {
+  try {
+    const stats = {
+      totalProducts: mockProducts.length,
+      totalUsers: 1234,
+      ordersToday: 56,
+      revenue: 12345.67,
+      recentOrders: [
+        { id: "001", customer: "John Doe", total: 299.99, status: "Completed", date: "2024-01-15" },
+        { id: "002", customer: "Jane Smith", total: 199.99, status: "Processing", date: "2024-01-14" },
+        { id: "003", customer: "Bob Johnson", total: 449.99, status: "Shipped", date: "2024-01-13" },
+      ],
+      topProducts: [
+        { name: "Wireless Headphones", sales: 45 },
+        { name: "Smart Watch", sales: 32 },
+        { name: "Camera Lens", sales: 28 },
+      ],
+    };
+    res.json(stats);
+  } catch (error) {
+    console.error("Error fetching stats:", error);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`API running on http://localhost:${PORT}`);
 });
