@@ -37,7 +37,7 @@ const heroSlides = [
   },
 ];
 
-export function HeroSection() {
+export default function HeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [imageLoaded, setImageLoaded] = useState<boolean[]>(new Array(heroSlides.length).fill(false));

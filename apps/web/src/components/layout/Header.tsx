@@ -1,263 +1,293 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import { useAppSelector } from "@/store/hooks";
-import { 
-  Search, 
-  ShoppingCart, 
-  User, 
-  Menu, 
-  X, 
-  Heart,
-  MapPin 
-} from "lucide-react";
+import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Search, ShoppingCart, User, Menu, X, LogOut, Settings, Package } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '@/store/store';
+import { getCurrentUser, logout } from '@/store/slices/authSlice';
 
-export function Header() {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isScrolled, setIsScrolled] = useState(false);
-  const { itemCount } = useAppSelector((state) => state.cart);
-  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+  
+  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const auth = useSelector((state: RootState) => state.auth);
+  const user = (auth as any).user;
+  const isAuthenticated = (auth as any).isAuthenticated;
+  const token = (auth as any).token;
+  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
-  const categories = [
-    "Electronics", "Fashion", "Home & Garden", "Sports", "Books", "Beauty"
-  ];
-
-  // Handle scroll effect
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    if (token && !user) {
+      dispatch(getCurrentUser());
+    }
+  }, [dispatch, token, user]);
 
-  // Close mobile menu on resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsMenuOpen(false);
-      }
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const handleLogout = () => {
+    dispatch(logout());
+    setIsUserMenuOpen(false);
+    router.push('/');
+  };
+
+  const getUserDashboardLink = () => {
+    if (!user) return '/login';
+    
+    switch (user.role) {
+      case 'ADMIN':
+        return '/admin/dashboard';
+      case 'SELLER':
+        return '/seller/dashboard';
+      default:
+        return '/account';
+    }
+  };
 
   return (
-    <header className={`bg-white sticky top-0 z-50 transition-all duration-200 ${
-      isScrolled ? 'shadow-lg' : 'shadow-md'
-    }`}>
-      {/* Top Bar - Hidden on mobile for space */}
-      <div className="bg-gray-900 text-white text-sm hidden sm:block">
-        <div className="container py-2 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center transition-all duration-200 hover:text-blue-300">
-              <MapPin className="w-4 h-4 mr-1" />
-              <span className="hidden md:inline">Free shipping on orders over $50</span>
-              <span className="md:hidden">Free shipping $50+</span>
-            </span>
-          </div>
-          <div className="flex items-center space-x-2 sm:space-x-4">
-            <Link href="/help" className="hover:text-gray-300 transition-colors duration-200 text-xs sm:text-sm">
-              Help
-            </Link>
-            <Link href="/track-order" className="hover:text-gray-300 transition-colors duration-200 text-xs sm:text-sm hidden sm:inline">
-              Track Order
-            </Link>
-            {!isAuthenticated ? (
-              <>
-                <Link href="/login" className="hover:text-gray-300 transition-colors duration-200 text-xs sm:text-sm">
-                  Sign In
-                </Link>
-                <Link href="/register" className="hover:text-gray-300 transition-colors duration-200 text-xs sm:text-sm hidden sm:inline">
-                  Register
-                </Link>
-              </>
-            ) : (
-              <span className="text-xs sm:text-sm truncate max-w-32">
-                Welcome, {user?.name || user?.email}
-              </span>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Header */}
-      <div className="container py-3 sm:py-4">
-        <div className="flex items-center justify-between gap-4">
+    <header className="bg-white shadow-sm border-b border-gray-200">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2 scale-on-hover">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-600 rounded-lg flex items-center justify-center transition-all duration-200 hover:bg-blue-700">
-              <span className="text-white font-bold text-lg sm:text-xl">E</span>
-            </div>
-            <span className="text-xl sm:text-2xl font-bold text-gray-900 hidden sm:block">
-              Bharat-Sanchaya
-            </span>
-            <span className="text-lg font-bold text-gray-900 sm:hidden">
-              EP
-            </span>
-          </Link>
-
-          {/* Search Bar - Responsive */}
-          <div className="flex-1 max-w-xl mx-2 sm:mx-4 lg:mx-8">
-            <form onSubmit={(e) => {
-              e.preventDefault();
-              if (searchQuery.trim()) {
-                window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
-              }
-            }}>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-4 pr-12 py-2 sm:py-3 border border-gray-300 rounded-lg input text-sm sm:text-base"
-                />
-                <button 
-                  type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-600 text-white p-1.5 sm:p-2 rounded-md hover:bg-blue-700 transition-all duration-200 bounce-on-click"
-                >
-                  <Search className="w-4 h-4 sm:w-5 sm:h-5" />
-                </button>
+          <div className="flex items-center">
+            <Link href="/" className="flex items-center">
+              <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">M</span>
               </div>
-            </form>
+              <span className="ml-2 text-xl font-bold text-gray-900">Bharat-Sanchaya</span>
+            </Link>
           </div>
 
-          {/* Right Actions - Responsive */}
-          <div className="flex items-center space-x-3 sm:space-x-6">
-            {/* Wishlist - Hidden on small mobile */}
-            <Link href="/wishlist" className="hidden xs:flex flex-col items-center text-gray-700 hover:text-blue-600 transition-all duration-200 scale-on-hover">
-              <Heart className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-xs mt-1 hidden sm:block">Wishlist</span>
-            </Link>
+          {/* Search Bar - Hidden on mobile */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <div className="relative w-full">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Search products..."
+              />
+            </div>
+          </div>
 
+          {/* Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link href="/" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+              Home
+            </Link>
+            <Link href="/products" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+              Products
+            </Link>
+            <Link href="/categories" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+              Categories
+            </Link>
+            <Link href="/about" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+              About
+            </Link>
+            <Link href="/contact" className="text-gray-700 hover:text-indigo-600 px-3 py-2 text-sm font-medium">
+              Contact
+            </Link>
+            {!isAuthenticated && (
+              <Link href="/seller/register" className="text-indigo-600 hover:text-indigo-700 px-3 py-2 text-sm font-medium">
+                Become a Seller
+              </Link>
+            )}
+          </nav>
+
+          {/* Right side icons */}
+          <div className="flex items-center space-x-4">
             {/* Cart */}
-            <Link href="/cart" className="flex flex-col items-center text-gray-700 hover:text-blue-600 relative transition-all duration-200 scale-on-hover">
-              <ShoppingCart className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-xs mt-1 hidden sm:block">Cart</span>
-              {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 sm:w-5 sm:h-5 flex items-center justify-center animate-pulse">
-                  {itemCount > 99 ? '99+' : itemCount}
+            <Link href="/cart" className="relative p-2 text-gray-700 hover:text-indigo-600">
+              <ShoppingCart className="h-6 w-6" />
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-indigo-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {totalItems}
                 </span>
               )}
             </Link>
 
-            {/* Profile - Hidden on small mobile */}
-            <Link href={isAuthenticated ? "/profile" : "/login"} className="hidden xs:flex flex-col items-center text-gray-700 hover:text-blue-600 transition-all duration-200 scale-on-hover">
-              <User className="w-5 h-5 sm:w-6 sm:h-6" />
-              <span className="text-xs mt-1 hidden sm:block">Profile</span>
-            </Link>
+            {/* User Account */}
+            {isAuthenticated && user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center p-2 text-gray-700 hover:text-indigo-600 focus:outline-none"
+                >
+                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                    <span className="text-indigo-600 font-medium text-sm">
+                      {user.firstName[0]}{user.lastName[0]}
+                    </span>
+                  </div>
+                </button>
 
-            {/* Mobile Menu Toggle */}
+                {/* User Dropdown Menu */}
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+                    <div className="px-4 py-2 border-b border-gray-200">
+                      <p className="text-sm font-medium text-gray-900">
+                        {user.firstName} {user.lastName}
+                      </p>
+                      <p className="text-xs text-gray-500">{user.email}</p>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1 ${
+                        user.role === 'ADMIN' 
+                          ? 'bg-red-100 text-red-800'
+                          : user.role === 'SELLER'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {user.role}
+                      </span>
+                    </div>
+                    
+                    <Link
+                      href={getUserDashboardLink()}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                      onClick={() => setIsUserMenuOpen(false)}
+                    >
+                      {user.role === 'ADMIN' ? (
+                        <Settings className="mr-3 h-4 w-4 text-red-500" />
+                      ) : user.role === 'SELLER' ? (
+                        <Package className="mr-3 h-4 w-4 text-blue-500" />
+                      ) : (
+                        <User className="mr-3 h-4 w-4" />
+                      )}
+                      {user.role === 'ADMIN' ? 'Admin Panel' : user.role === 'SELLER' ? 'Seller Dashboard' : 'My Account'}
+                    </Link>
+                    
+                    {user.role === 'CUSTOMER' && (
+                      <Link
+                        href="/orders"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsUserMenuOpen(false)}
+                      >
+                        <ShoppingCart className="mr-3 h-4 w-4" />
+                        My Orders
+                      </Link>
+                    )}
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <LogOut className="mr-3 h-4 w-4" />
+                      Sign Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <Link href="/login" className="p-2 text-gray-700 hover:text-indigo-600">
+                <User className="h-6 w-6" />
+              </Link>
+            )}
+
+            {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden text-gray-700 hover:text-blue-600 p-1 transition-all duration-200 bounce-on-click"
-              aria-label="Toggle menu"
+              className="md:hidden p-2 text-gray-700 hover:text-indigo-600"
             >
-              <div className="relative w-6 h-6">
-                <Menu className={`w-6 h-6 absolute transition-all duration-200 ${isMenuOpen ? 'opacity-0 rotate-90' : 'opacity-100 rotate-0'}`} />
-                <X className={`w-6 h-6 absolute transition-all duration-200 ${isMenuOpen ? 'opacity-100 rotate-0' : 'opacity-0 -rotate-90'}`} />
-              </div>
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
-      </div>
 
-      {/* Categories Navigation - Desktop */}
-      <div className="border-t border-gray-200 hidden lg:block">
-        <div className="container">
-          <nav className="flex items-center space-x-8 py-3 overflow-x-auto scrollbar-hide">
-            <Link href="/categories/all" className="whitespace-nowrap text-gray-700 hover:text-blue-600 font-medium transition-all duration-200 hover:scale-105">
-              All Categories
-            </Link>
-            {categories.map((category, index) => (
-              <Link
-                key={category}
-                href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`}
-                className="whitespace-nowrap text-gray-700 hover:text-blue-600 transition-all duration-200 hover:scale-105"
-                style={{ animationDelay: `${index * 50}ms` }}
-              >
-                {category}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      </div>
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
+              {/* Mobile search */}
+              <div className="relative mb-3">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search className="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                  placeholder="Search products..."
+                />
+              </div>
 
-      {/* Mobile Menu */}
-      <div className={`lg:hidden bg-white border-t border-gray-200 mobile-menu ${isMenuOpen ? 'open' : ''} absolute w-full shadow-lg`}>
-        <div className="container py-4">
-          <div className="flex flex-col space-y-1">
-            {/* Mobile-only profile and wishlist links */}
-            <div className="flex items-center justify-between py-3 border-b border-gray-100 mb-2">
               <Link
-                href={isAuthenticated ? "/profile" : "/login"}
-                className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                href="/"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <User className="w-5 h-5" />
-                <span>{isAuthenticated ? 'My Account' : 'Sign In'}</span>
+                Home
               </Link>
               <Link
-                href="/wishlist"
-                className="flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200"
+                href="/products"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
-                <Heart className="w-5 h-5" />
-                <span>Wishlist</span>
-              </Link>
-            </div>
-            
-            {/* Categories */}
-            <Link
-              href="/categories/all"
-              className="text-gray-700 hover:text-blue-600 py-3 px-2 rounded-lg hover:bg-gray-50 transition-all duration-200 font-medium"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              All Categories
-            </Link>
-            {categories.map((category, index) => (
-              <Link
-                key={category}
-                href={`/categories/${category.toLowerCase().replace(/\s+/g, '-')}`}
-                className="text-gray-700 hover:text-blue-600 py-3 px-2 rounded-lg hover:bg-gray-50 transition-all duration-200 stagger-item"
-                onClick={() => setIsMenuOpen(false)}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                {category}
-              </Link>
-            ))}
-            
-            {/* Mobile-only links */}
-            <div className="border-t border-gray-100 pt-4 mt-4">
-              <Link
-                href="/help"
-                className="text-gray-700 hover:text-blue-600 py-2 px-2 block transition-colors duration-200"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Help & Support
+                Products
               </Link>
               <Link
-                href="/track-order"
-                className="text-gray-700 hover:text-blue-600 py-2 px-2 block transition-colors duration-200"
+                href="/categories"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Track Your Order
+                Categories
               </Link>
+              <Link
+                href="/about"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                About
+              </Link>
+              <Link
+                href="/contact"
+                className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contact
+              </Link>
+              
+              {isAuthenticated && user ? (
+                <>
+                  <Link
+                    href={getUserDashboardLink()}
+                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {user.role === 'ADMIN' ? 'Admin Panel' : user.role === 'SELLER' ? 'Dashboard' : 'My Account'}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href="/login"
+                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    href="/seller/register"
+                    className="block px-3 py-2 text-base font-medium text-indigo-600 hover:text-indigo-700 hover:bg-gray-50 rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Become a Seller
+                  </Link>
+                </>
+              )}
             </div>
           </div>
-        </div>
+        )}
       </div>
-
-      {/* Overlay for mobile menu */}
-      {isMenuOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-25 z-40 lg:hidden"
-          onClick={() => setIsMenuOpen(false)}
-        />
-      )}
     </header>
   );
 }

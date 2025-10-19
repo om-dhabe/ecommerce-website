@@ -1,10 +1,11 @@
-import { Product } from "@/store/slices/productsSlice";
+import { Product } from "@/types";
 import { ProductCard } from "./ProductCard";
 import { Package } from "lucide-react";
 
 interface ProductGridProps {
   products: Product[];
-  loading: boolean;
+  loading?: boolean;
+  viewMode?: 'grid' | 'list';
 }
 
 const SkeletonCard = ({ index }: { index: number }) => (
@@ -49,9 +50,11 @@ const EmptyState = () => (
   </div>
 );
 
-export function ProductGrid({ products, loading }: ProductGridProps) {
+export default function ProductGrid({ products, loading = false, viewMode = 'grid' }: ProductGridProps) {
   // Responsive grid classes - max 4 cards per row
-  const gridClasses = "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4";
+  const gridClasses = viewMode === 'grid' 
+    ? "grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+    : "space-y-4";
 
   if (loading) {
     return (
@@ -78,6 +81,7 @@ export function ProductGrid({ products, loading }: ProductGridProps) {
           key={product.id} 
           product={product} 
           index={index}
+          viewMode={viewMode}
         />
       ))}
     </div>

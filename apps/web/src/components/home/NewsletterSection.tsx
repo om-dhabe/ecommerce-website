@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Mail, Gift } from "lucide-react";
 
-export function NewsletterSection() {
+export default function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
 

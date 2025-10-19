@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,20 +10,335 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  CUSTOMER
+  SELLER
+  ADMIN
+}
+
+enum SellerStatus {
+  PENDING
+  APPROVED
+  SUSPENDED
+  REJECTED
+}
+
+enum ProductStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  REJECTED
+  ARCHIVED
+}
+
+enum OrderStatus {
+  CREATED
+  PAID
+  COD
+  PACKED
+  SHIPPED
+  DELIVERED
+  COMPLETED
+  RETURNED
+}
+
+enum PaymentStatus {
+  INITIATED
+  AUTHORIZED
+  CAPTURED
+  PAID
+  CASH_ON_DELIVERY
+  COLLECTED
+  REMITTED
+  REFUNDED
+  FAILED
+}
+
+enum ReturnStatus {
+  REQUESTED
+  APPROVED
+  REJECTED
+  RECEIVED
+  REFUNDED
+  EXCHANGED
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                     String    @id @default(cuid())
+  email                  String    @unique @db.VarChar(255)
+  password               String    @db.VarChar(255)
+  firstName              String    @map("first_name") @db.VarChar(100)
+  lastName               String    @map("last_name") @db.VarChar(100)
+  role                   UserRole  @default(CUSTOMER)
+  isEmailVerified        Boolean   @default(false) @map("is_email_verified")
+  emailVerificationToken String?   @map("email_verification_token") @db.VarChar(255)
+  passwordResetToken     String?   @map("password_reset_token") @db.VarChar(255)
+  passwordResetExpires   DateTime? @map("password_reset_expires")
+  createdAt              DateTime  @default(now()) @map("created_at")
+  updatedAt              DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  sellerProfile SellerProfile?
+  orders        Order[]
+  reviews       Review[]
+  auditEvents   AuditEvent[]
+
+  @@map("users")
+}
+
+model SellerProfile {
+  id              String       @id @default(cuid())
+  userId          String       @unique @map("user_id")
+  businessName    String       @map("business_name") @db.VarChar(255)
+  businessEmail   String       @map("business_email") @db.VarChar(255)
+  businessPhone   String       @map("business_phone") @db.VarChar(50)
+  businessAddress String       @map("business_address") @db.Text
+  taxId           String?      @map("tax_id") @db.VarChar(100)
+  status          SellerStatus @default(PENDING)
+  approvedAt      DateTime?    @map("approved_at")
+  approvedBy      String?      @map("approved_by")
+  rejectionReason String?      @map("rejection_reason") @db.Text
+  createdAt       DateTime     @default(now()) @map("created_at")
+  updatedAt       DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products Product[]
+  orders   Order[]
+
+  @@map("seller_profiles")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique @db.VarChar(255)
+  slug        String    @unique @db.VarChar(255)
+  description String?   @db.Text
+  image       String?   @db.VarChar(500)
+  isActive    Boolean   @default(true) @map("is_active")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  products    Product[]
+
+  @@map("categories")
 }
 
 model Product {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  price       Decimal  @db.Decimal(10,2)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id               String        @id @default(cuid())
+  name             String        @db.VarChar(255)
+  slug             String        @unique @db.VarChar(255)
+  description      String        @db.Text
+  shortDescription String?       @map("short_description") @db.Text
+  images           String        @db.Text // Store as JSON string for MySQL compatibility
+  status           ProductStatus @default(DRAFT)
+  sellerId         String        @map("seller_id")
+  categoryId       String        @map("category_id")
+  basePrice        Decimal       @map("base_price") @db.Decimal(10, 2)
+  isActive         Boolean       @default(true) @map("is_active")
+  rejectionReason  String?       @map("rejection_reason") @db.Text
+  approvedAt       DateTime?     @map("approved_at")
+  approvedBy       String?       @map("approved_by")
+  createdAt        DateTime      @default(now()) @map("created_at")
+  updatedAt        DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  seller     SellerProfile    @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  category   Category         @relation(fields: [categoryId], references: [id])
+  variants   ProductVariant[]
+  orderItems OrderItem[]
+  reviews    Review[]
+
+  @@index([status])
+  @@index([sellerId])
+  @@index([categoryId])
+  @@map("products")
+}
+
+model ProductVariant {
+  id           String     @id @default(cuid())
+  productId    String     @map("product_id")
+  name         String     @db.VarChar(255)
+  sku          String     @unique @db.VarChar(255)
+  price        Decimal    @db.Decimal(10, 2)
+  comparePrice Decimal?   @map("compare_price") @db.Decimal(10, 2)
+  inventory    Int        @default(0)
+  attributes   String     @db.Text // Store as JSON string for MySQL compatibility
+  isActive     Boolean    @default(true) @map("is_active")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  orderItems OrderItem[]
+
+  @@map("product_variants")
+}
+
+model Order {
+  id            String        @id @default(cuid())
+  orderNumber   String        @unique @map("order_number") @db.VarChar(100)
+  customerId    String        @map("customer_id")
+  sellerId      String        @map("seller_id")
+  status        OrderStatus   @default(CREATED)
+  paymentStatus PaymentStatus @default(INITIATED) @map("payment_status")
+  subtotal      Decimal       @db.Decimal(10, 2)
+  tax           Decimal       @db.Decimal(10, 2) @default(0)
+  shipping      Decimal       @db.Decimal(10, 2) @default(0)
+  total         Decimal       @db.Decimal(10, 2)
+  currency      String        @default("USD") @db.VarChar(3)
+
+  // Shipping Address
+  shippingFirstName String  @map("shipping_first_name") @db.VarChar(100)
+  shippingLastName  String  @map("shipping_last_name") @db.VarChar(100)
+  shippingAddress1  String  @map("shipping_address1") @db.VarChar(255)
+  shippingAddress2  String? @map("shipping_address2") @db.VarChar(255)
+  shippingCity      String  @map("shipping_city") @db.VarChar(100)
+  shippingState     String  @map("shipping_state") @db.VarChar(100)
+  shippingZip       String  @map("shipping_zip") @db.VarChar(20)
+  shippingCountry   String  @map("shipping_country") @db.VarChar(100)
+  shippingPhone     String? @map("shipping_phone") @db.VarChar(50)
+
+  // Billing Address
+  billingFirstName String  @map("billing_first_name") @db.VarChar(100)
+  billingLastName  String  @map("billing_last_name") @db.VarChar(100)
+  billingAddress1  String  @map("billing_address1") @db.VarChar(255)
+  billingAddress2  String? @map("billing_address2") @db.VarChar(255)
+  billingCity      String  @map("billing_city") @db.VarChar(100)
+  billingState     String  @map("billing_state") @db.VarChar(100)
+  billingZip       String  @map("billing_zip") @db.VarChar(20)
+  billingCountry   String  @map("billing_country") @db.VarChar(100)
+
+  notes     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  customer User          @relation(fields: [customerId], references: [id])
+  seller   SellerProfile @relation(fields: [sellerId], references: [id])
+  items    OrderItem[]
+  payments Payment[]
+  returns  Return[]
+
+  @@index([customerId])
+  @@index([sellerId])
+  @@index([status])
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String   @map("order_id")
+  productId String   @map("product_id")
+  variantId String?  @map("variant_id")
+  quantity  Int
+  price     Decimal  @db.Decimal(10, 2)
+  total     Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product         @relation(fields: [productId], references: [id])
+  variant ProductVariant? @relation(fields: [variantId], references: [id])
+
+  @@map("order_items")
+}
+
+model Payment {
+  id                String        @id @default(cuid())
+  orderId           String        @map("order_id")
+  amount            Decimal       @db.Decimal(10, 2)
+  currency          String        @default("USD") @db.VarChar(3)
+  status            PaymentStatus @default(INITIATED)
+  paymentMethod     String        @map("payment_method") @db.VarChar(50)
+  transactionId     String?       @map("transaction_id") @db.VarChar(255)
+  idempotencyKey    String        @unique @map("idempotency_key") @db.VarChar(255)
+  externalReference String?       @map("external_reference") @db.VarChar(255)
+  metadata          String?       @db.Text // Store as JSON string for MySQL compatibility
+  processedAt       DateTime?     @map("processed_at")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  order             Order         @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("payments")
+}
+
+
+
+model Return {
+  id           String       @id @default(cuid())
+  orderId      String       @map("order_id")
+  reason       String       @db.Text
+  status       ReturnStatus @default(REQUESTED)
+  requestedAt  DateTime     @default(now()) @map("requested_at")
+  approvedAt   DateTime?    @map("approved_at")
+  receivedAt   DateTime?    @map("received_at")
+  refundedAt   DateTime?    @map("refunded_at")
+  refundAmount Decimal?     @map("refund_amount") @db.Decimal(10, 2)
+  notes        String?      @db.Text
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  // Relations
+  order        Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@map("returns")
+}
+
+model Review {
+  id          String    @id @default(cuid())
+  productId   String    @map("product_id")
+  customerId  String    @map("customer_id")
+  rating      Int       // 1-5 stars
+  title       String?   @db.VarChar(255)
+  comment     String?   @db.Text
+  isApproved  Boolean   @default(false) @map("is_approved")
+  isModerated Boolean   @default(false) @map("is_moderated")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  product     Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customer    User      @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, customerId])
+  @@map("reviews")
+}
+
+
+
+model AuditEvent {
+  id          String    @id @default(cuid())
+  userId      String?   @map("user_id")
+  entityType  String    @map("entity_type") @db.VarChar(100)
+  entityId    String    @map("entity_id")
+  action      String    @db.VarChar(100)
+  oldValues   String?   @map("old_values") @db.Text // Store as JSON string
+  newValues   String?   @map("new_values") @db.Text // Store as JSON string
+  metadata    String?   @db.Text // Store as JSON string
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Relations
+  user        User?     @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+  @@map("audit_events")
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  type        String    @db.VarChar(100)
+  title       String    @db.VarChar(255)
+  message     String    @db.Text
+  isRead      Boolean   @default(false) @map("is_read")
+  metadata    String?   @db.Text // Store as JSON string
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("notifications")
 }

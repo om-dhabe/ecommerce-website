@@ -1,15 +1,21 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface Product {
-  id: number;
-  title: string;
-  description?: string;
-  price: number;
-  image?: string;
-  category?: string;
-  rating?: number;
-  reviews?: number;
-  inStock?: boolean;
+  id: string;
+  name: string;
+  description: string;
+  basePrice: number;
+  status: string;
+  images: string[];
+  category: {
+    name: string;
+    slug: string;
+  };
+  seller: {
+    businessName: string;
+  };
+  avgRating: number;
+  reviewCount: number;
 }
 
 interface ProductsState {

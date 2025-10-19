@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Product } from "@/store/slices/productsSlice";
+import { Product } from "@/types";
 import { addToCart } from "@/store/slices/cartSlice";
 import { useAppDispatch } from "@/store/hooks";
 import { Heart, Star, ShoppingCart, Eye } from "lucide-react";
@@ -10,9 +10,10 @@ import { Heart, Star, ShoppingCart, Eye } from "lucide-react";
 interface ProductCardProps {
   product: Product;
   index?: number;
+  viewMode?: 'grid' | 'list';
 }
 
-export function ProductCard({ product, index = 0 }: ProductCardProps) {
+export function ProductCard({ product, index = 0, viewMode = 'grid' }: ProductCardProps) {
   const dispatch = useAppDispatch();
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
@@ -23,17 +24,17 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     e.preventDefault();
     e.stopPropagation();
     
-    if (!product.inStock || addingToCart) return;
+    if (product.stock === 0 || addingToCart) return;
     
     setAddingToCart(true);
     
     // Add subtle delay for better UX feedback
     setTimeout(() => {
       dispatch(addToCart({
-        id: product.id,
-        title: product.title,
+        id: parseInt(product.id),
+        title: product.name,
         price: product.price,
-        image: product.image,
+        image: product.images[0] || '',
       }));
       setAddingToCart(false);
     }, 300);
@@ -58,6 +59,60 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
     ));
   };
 
+  if (viewMode === 'list') {
+    return (
+      <div className="group bg-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+        <Link href={`/products/${product.id}`} className="flex p-4 space-x-4">
+          <div className="relative w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0">
+            <img
+              src={product.images[0] || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop"}
+              alt={product.name}
+              className="w-full h-full object-cover rounded-lg"
+              loading="lazy"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex justify-between items-start">
+              <div className="flex-1">
+                <span className="text-xs text-gray-500 uppercase tracking-wide font-medium">
+                  {product.category.name}
+                </span>
+                <h3 className="font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">
+                  {product.name}
+                </h3>
+                {product.description && (
+                  <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                    {product.description}
+                  </p>
+                )}
+                {product.rating && (
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="flex">
+                      {renderStars(product.rating)}
+                    </div>
+                    <span className="text-sm text-gray-600">{product.rating}</span>
+                  </div>
+                )}
+              </div>
+              <div className="text-right ml-4">
+                <div className="text-xl font-bold text-gray-900 mb-2">
+                  ${product.price}
+                </div>
+                <button
+                  onClick={handleAddToCart}
+                  disabled={product.stock === 0 || addingToCart}
+                  className="btn-primary text-sm px-4 py-2 disabled:opacity-50"
+                >
+                  {addingToCart ? 'Adding...' : 'Add to Cart'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div
       className="group relative bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden card stagger-item"
@@ -73,8 +128,8 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
           )}
           
           <img
-            src={product.image || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop"}
-            alt={product.title}
+            src={product.images[0] || "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop"}
+            alt={product.name}
             className={`w-full h-full object-cover group-hover:scale-105 transition-all duration-500 ${
               imageLoaded ? 'opacity-100' : 'opacity-0'
             }`}
@@ -89,7 +144,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             <div className="flex items-center space-x-2 sm:space-x-3">
               <button
                 onClick={handleAddToCart}
-                disabled={!product.inStock || addingToCart}
+                disabled={product.stock === 0 || addingToCart}
                 className={`bg-white text-gray-900 p-2 sm:p-3 rounded-full hover:bg-gray-100 transition-all duration-200 bounce-on-click disabled:opacity-50 disabled:cursor-not-allowed ${
                   addingToCart ? 'scale-95' : ''
                 }`}
@@ -123,12 +178,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
           {/* Status Badges */}
           <div className="absolute top-2 left-2 sm:top-3 sm:left-3 flex flex-col space-y-1">
-            {!product.inStock && (
+            {product.stock === 0 && (
               <div className="bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
                 Out of Stock
               </div>
             )}
-            {product.price < 100 && product.inStock && (
+            {product.price < 100 && product.stock > 0 && (
               <div className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">
                 Sale
               </div>
@@ -139,12 +194,12 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <div className="p-3 sm:p-4">
           <div className="mb-2">
             <span className="text-xs sm:text-sm text-gray-500 uppercase tracking-wide font-medium">
-              {product.category}
+              {product.category.name}
             </span>
           </div>
           
           <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200 text-sm sm:text-base leading-tight">
-            {product.title}
+            {product.name}
           </h3>
           
           {product.description && (
@@ -162,9 +217,9 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               <span className="text-xs sm:text-sm text-gray-600 font-medium">
                 {product.rating}
               </span>
-              {product.reviews && (
+              {product.reviewCount && (
                 <span className="text-xs text-gray-500 hidden sm:inline">
-                  ({product.reviews.toLocaleString()})
+                  ({product.reviewCount.toLocaleString()})
                 </span>
               )}
             </div>
@@ -185,7 +240,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
             {/* Mobile: Icon button, Desktop: Text button */}
             <button
               onClick={handleAddToCart}
-              disabled={!product.inStock || addingToCart}
+              disabled={product.stock === 0 || addingToCart}
               className="btn-primary text-xs sm:text-sm px-2 py-1 sm:px-4 sm:py-2 disabled:opacity-50 disabled:cursor-not-allowed min-h-[32px] sm:min-h-[36px] flex items-center justify-center"
             >
               <span className="hidden sm:inline">

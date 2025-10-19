@@ -30,7 +30,7 @@ const SkeletonCard = ({ index }: { index: number }) => (
   </div>
 );
 
-export function TrendingProducts({ products, loading }: TrendingProductsProps) {
+export default function TrendingProducts({ products, loading }: TrendingProductsProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: 'left' | 'right') => {

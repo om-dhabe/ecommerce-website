@@ -1,202 +1,242 @@
-# Bharat-Sanchaya - Professional E-commerce Marketplace
+# Multi-Vendor E-commerce Platform
 
-A modern, AI-powered multi-vendor e-commerce marketplace built with Next.js, Express.js, and MySQL. This project implements a complete e-commerce solution with secure payments, smart recommendations, and a professional user interface.
+A comprehensive multi-vendor bharat-sanchaya built with Next.js, Express.js, and PostgreSQL. Features separate authentication for customers, sellers, and admins with role-based access control, product approval workflows, and comprehensive order management.
 
 ## 🚀 Features
 
-### Frontend (Next.js 15)
-- **Modern UI/UX**: Professional design with Tailwind CSS
-- **Responsive Design**: Mobile-first approach for all devices
-- **Product Catalog**: Advanced filtering and search functionality
-- **Shopping Cart**: Real-time cart management with Redux
-- **User Authentication**: Secure login/register system
-- **Product Details**: Comprehensive product pages with reviews
-- **Category Navigation**: Organized product browsing
-- **Search Functionality**: Smart product search with filters
+### Core Functionality
+- **Multi-vendor bharat-sanchaya** with separate seller onboarding
+- **Role-based access control** (Customer, Seller, Admin)
+- **Product lifecycle management** (Draft → Pending → Approved/Rejected → Archived)
+- **Order management** with COD and prepaid payment support
+- **Email verification** and notifications
+- **Comprehensive admin dashboard** with analytics
+- **Seller dashboard** with product and order management
 
-### Backend (Express.js)
-- **RESTful API**: Clean API architecture with proper error handling
-- **Product Management**: CRUD operations for products
-- **User Management**: Authentication and authorization
-- **Database Integration**: MySQL with Prisma ORM
-- **Security**: CORS, Helmet, and input validation
-- **Mock Data**: Rich product dataset for development
+### Authentication & Security
+- JWT-based authentication with secure token management
+- Email verification for all user registrations
+- Separate login flows for customers and sellers
+- Role-based route protection
+- Audit logging for sensitive operations
 
-### Technical Stack
-- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **State Management**: Redux Toolkit
-- **Backend**: Node.js, Express.js, TypeScript
-- **Database**: MySQL 8.0 with Prisma ORM
-- **Development**: Docker Compose for local development
-- **Icons**: Lucide React for consistent iconography
+### Product Management
+- Product approval workflow with admin moderation
+- Bulk product submission for approval
+- Product variants with inventory tracking
+- Category management
+- Image upload support
 
-## 📁 Project Structure
+### Order & Payment System
+- Support for both prepaid and Cash on Delivery (COD)
+- Idempotent payment processing
+- Order status tracking
+- Return management system
+- Payment status reconciliation
+
+### Admin Features
+- Seller approval/rejection workflow
+- Product moderation queue with batch actions
+- Comprehensive analytics dashboard
+- User management
+- System-wide settings
+
+## 🏗️ Project Structure
 
 ```
 ecommerce-mono/
 ├── apps/
-│   ├── web/                 # Next.js frontend application
+│   ├── web/                    # Next.js frontend
 │   │   ├── src/
-│   │   │   ├── app/         # Next.js 13+ app directory
-│   │   │   ├── components/  # Reusable React components
-│   │   │   ├── store/       # Redux store and slices
-│   │   │   └── lib/         # Utility functions and API calls
+│   │   │   ├── app/           # App router pages
+│   │   │   ├── components/    # Reusable components
+│   │   │   │   ├── auth/      # Authentication components
+│   │   │   │   ├── admin/     # Admin-specific components
+│   │   │   │   ├── seller/    # Seller-specific components
+│   │   │   │   └── layout/    # Layout components
+│   │   │   └── store/         # Redux store and slices
 │   │   └── package.json
-│   └── api/                 # Express.js backend API
+│   └── api/                   # Express.js backend
 │       ├── src/
-│       │   └── index.ts     # Main API server
-│       ├── prisma/          # Database schema and migrations
+│       │   ├── routes/        # API routes
+│       │   ├── utils/         # Utility functions
+│       │   └── index.ts       # Main server file
+│       ├── prisma/            # Database schema and migrations
 │       └── package.json
-├── docker-compose.yml       # MySQL and Adminer services
-├── package.json            # Root package.json with workspaces
-└── README.md
+└── package.json               # Root package.json
 ```
 
-## 🛠️ Installation & Setup
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 15** - React framework with App Router
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Utility-first CSS framework
+- **Redux Toolkit** - State management
+- **React Hook Form** - Form handling
+- **Lucide React** - Icon library
+
+### Backend
+- **Express.js** - Node.js web framework
+- **TypeScript** - Type safety
+- **Prisma** - Database ORM
+- **PostgreSQL** - Primary database
+- **JWT** - Authentication tokens
+- **Nodemailer** - Email sending
+- **Zod** - Schema validation
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm
-- Docker and Docker Compose (for database)
-- Git
+- Node.js 18+ 
+- PostgreSQL database
+- SMTP server for email (Gmail, SendGrid, etc.)
 
-### 1. Clone the Repository
+### Installation
+
+1. **Clone the repository**
 ```bash
-git clone https://github.com/om-dhabe/ecommerce-website.git
-cd ecommerce-website
+git clone <repository-url>
+cd ecommerce-mono
 ```
 
-### 2. Install Dependencies
+2. **Install dependencies**
 ```bash
-# Install all dependencies for both frontend and backend
 npm install
 ```
 
-### 3. Start Database Services
-```bash
-# Start MySQL and Adminer with Docker
-docker compose up -d
+3. **Set up environment variables**
+
+Backend (`apps/api/.env`):
+```env
+DATABASE_URL="postgresql://username:password@localhost:5432/multivendor_ecommerce"
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_SECURE="false"
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
+FROM_EMAIL="noreply@bharat-sanchaya.com"
+FRONTEND_URL="http://localhost:3000"
+PORT="3001"
+NODE_ENV="development"
 ```
 
-### 4. Set up Database
+Frontend (`apps/web/.env.local`):
+```env
+NEXT_PUBLIC_API_URL=http://localhost:3001/api
+NEXT_PUBLIC_APP_NAME="Multi-Vendor Bharat-Sanchaya"
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+4. **Set up the database**
 ```bash
-# Navigate to API directory and run Prisma migrations
 cd apps/api
 npx prisma generate
 npx prisma migrate dev --name init
 ```
 
-### 5. Start Development Servers
+5. **Start development servers**
 ```bash
-# From the root directory, start both frontend and backend
+# From root directory
 npm run dev
 ```
 
-This will start:
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:4000
-- **Database Admin (Adminer)**: http://localhost:8080
+This starts:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:3001
 
-## 🌐 Available Pages
+## 📱 User Flows
 
-- **Homepage** (`/`) - Hero section, featured categories, trending products
-- **Product Categories** (`/categories/[category]`) - Filtered product listings
-- **Product Details** (`/products/[id]`) - Individual product information
-- **Shopping Cart** (`/cart`) - Cart management and checkout
-- **Search** (`/search`) - Product search with filters
-- **User Authentication** (`/login`) - Login and registration
-- **About Us** (`/about`) - Company information
-- **Contact** (`/contact`) - Contact form and information
+### Customer Flow
+1. Register/Login as customer
+2. Browse products and categories
+3. Add products to cart
+4. Place orders (prepaid or COD)
+5. Track order status
+6. Leave product reviews
 
-## 🔧 API Endpoints
+### Seller Flow
+1. Register as seller (requires admin approval)
+2. Complete seller profile
+3. Create products (saved as drafts)
+4. Submit products for approval
+5. Manage approved products
+6. Process orders
+7. Handle returns
 
-### Products
-- `GET /products` - Get all products
-- `GET /products/:id` - Get product by ID
-- `GET /health` - Health check endpoint
+### Admin Flow
+1. Login with admin credentials
+2. Review and approve/reject seller applications
+3. Moderate product submissions
+4. Monitor bharat-sanchaya analytics
+5. Manage users and settings
+6. Handle disputes and returns
 
-### Future Endpoints (Planned)
-- `POST /auth/login` - User authentication
-- `POST /auth/register` - User registration
-- `POST /cart` - Cart management
-- `POST /orders` - Order processing
+## 🔐 Authentication & Authorization
 
-## 🎨 Design System
+### User Roles
+- **CUSTOMER**: Can browse, purchase, and review products
+- **SELLER**: Can manage products and orders (after approval)
+- **ADMIN**: Full bharat-sanchaya control
 
-The application uses a consistent design system with:
-- **Color Palette**: Blue primary, with gray and accent colors
-- **Typography**: Inter font family for modern readability
-- **Components**: Reusable UI components with consistent styling
-- **Responsive**: Mobile-first design approach
-- **Accessibility**: WCAG compliant components
+### Protected Routes
+- `/seller/*` - Requires SELLER or ADMIN role
+- `/admin/*` - Requires ADMIN role
+- API endpoints protected with JWT middleware
+
+## 📊 Database Schema
+
+Key entities:
+- **User** - Base user with role (Customer/Seller/Admin)
+- **SellerProfile** - Extended seller information
+- **Product** - Products with approval status
+- **ProductVariant** - Product variations with inventory
+- **Order** - Customer orders
+- **Payment** - Payment tracking with idempotency
+- **AuditEvent** - System audit logs
 
 ## 🚀 Deployment
 
-### Frontend (Vercel/Netlify)
-```bash
-cd apps/web
-npm run build
-```
+### Backend Deployment
+1. Set up PostgreSQL database
+2. Configure environment variables
+3. Run database migrations
+4. Deploy to your preferred platform (Heroku, Railway, etc.)
 
-### Backend (Railway/Render/AWS)
-```bash
-cd apps/api
-npm run build
-npm start
-```
-
-### Database
-- Use managed MySQL service (PlanetScale, AWS RDS, etc.)
-- Update `DATABASE_URL` in environment variables
-
-## 🔮 Future Enhancements
-
-Based on the project plan, upcoming features include:
-
-### Phase 1: Core Features ✅
-- [x] User authentication and authorization
-- [x] Product catalog with search and filters
-- [x] Shopping cart functionality
-- [x] Responsive design
-
-### Phase 2: Advanced Features (Planned)
-- [ ] Payment integration (Stripe/Razorpay)
-- [ ] Order management system
-- [ ] Email notifications
-- [ ] Vendor dashboard
-- [ ] Admin panel
-
-### Phase 3: AI Integration (Planned)
-- [ ] AI-powered product recommendations
-- [ ] Chatbot for customer support
-- [ ] Natural language search
-- [ ] Dynamic personalization
-
-### Phase 4: Scaling (Planned)
-- [ ] Performance optimization
-- [ ] Advanced analytics
-- [ ] Mobile app (React Native)
-- [ ] Multi-language support
+### Frontend Deployment
+1. Configure API URL in environment variables
+2. Build the application: `npm run build`
+3. Deploy to Vercel, Netlify, or your preferred platform
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
 
-## 📄 License
+## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-## 👨‍💻 Author
+## 🆘 Support
 
-**Om Dhabe**
-- GitHub: [@om-dhabe](https://github.com/om-dhabe)
-- Project: [Bharat-Sanchaya](https://github.com/om-dhabe/ecommerce-website)
+For support and questions:
+- Create an issue in the repository
+- Check the documentation
+- Review the code comments for implementation details
 
-## 🙏 Acknowledgments
+## 🔄 Development Status
 
-- Built following modern e-commerce best practices
-- Inspired by leading marketplaces like Amazon and Flipkart
-- Uses cutting-edge web technologies for optimal performance
+This is a comprehensive multi-vendor platform with:
+- ✅ Complete authentication system
+- ✅ Role-based access control
+- ✅ Product management with approval workflow
+- ✅ Order management system
+- ✅ Admin and seller dashboards
+- ✅ Email notifications
+- ⏳ Payment gateway integration (ready for implementation)
+- ⏳ Advanced analytics and reporting
+- ⏳ Mobile app support

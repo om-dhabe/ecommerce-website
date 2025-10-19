@@ -618,4 +618,101 @@ img[loading="lazy"].loaded {
 
 .product-image {
   transition: transform 0.3s ease;
+}/* Dashboar
+d Layout Improvements */
+.dashboard-sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.dashboard-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.dashboard-sidebar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(156, 163, 175, 0.7);
+}
+
+/* Smooth transitions for sidebar */
+.sidebar-transition {
+  transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Content area improvements */
+.dashboard-content {
+  min-height: calc(100vh - 4rem);
+}
+
+/* Mobile improvements */
+@media (max-width: 1024px) {
+  .dashboard-sidebar {
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Focus improvements for accessibility */
+.nav-link:focus {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Loading spinner improvements */
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}/
+* Dashboard layout specific styles */
+.dashboard-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.dashboard-main {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Ensure proper layout for admin/seller dashboards */
+.admin-layout,
+.seller-layout {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.admin-layout .dashboard-main,
+.seller-layout .dashboard-main {
+  height: 100vh;
+  overflow-y: auto;
+}
+
+/* Improve sidebar positioning */
+.admin-layout .dashboard-sidebar,
+.seller-layout .dashboard-sidebar {
+  height: 100vh;
+}
+
+/* Better mobile sidebar */
+@media (max-width: 1024px) {
+  .admin-layout .dashboard-sidebar,
+  .seller-layout .dashboard-sidebar {
+    height: 100vh;
+    backdrop-filter: blur(8px);
+  }
 }

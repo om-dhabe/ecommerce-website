@@ -9,7 +9,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl font-bold mb-6">About Bharat-Sanchaya</h1>
             <p className="text-xl text-blue-100 mb-8">
-              Your trusted marketplace connecting millions of customers with verified vendors worldwide
+              Your trusted bharat-sanchaya connecting millions of customers with verified vendors worldwide
             </p>
           </div>
         </div>
@@ -21,7 +21,7 @@ export default function AboutPage() {
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold text-gray-900 mb-8">Our Mission</h2>
             <p className="text-lg text-gray-600 leading-relaxed">
-              At Bharat-Sanchaya, we're revolutionizing online shopping by creating a secure, AI-powered marketplace 
+              At Bharat-Sanchaya, we're revolutionizing online shopping by creating a secure, AI-powered bharat-sanchaya 
               that connects customers with quality products from trusted vendors around the world. Our mission is 
               to make online shopping safer, smarter, and more personalized for everyone.
             </p>

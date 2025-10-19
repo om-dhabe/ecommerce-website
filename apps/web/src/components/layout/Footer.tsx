@@ -12,7 +12,7 @@ import {
   Truck
 } from "lucide-react";
 
-export function Footer() {
+export default function Footer() {
   return (
     <footer className="bg-gray-900 text-white">
       {/* Features Section */}
@@ -62,7 +62,7 @@ export function Footer() {
               <span className="text-lg sm:text-xl font-bold">Bharat-Sanchaya</span>
             </div>
             <p className="text-gray-400 mb-6 text-sm sm:text-base leading-relaxed">
-              Your trusted marketplace for quality products from verified vendors worldwide.
+              Your trusted bharat-sanchaya for quality products from verified vendors worldwide.
             </p>
             <div className="flex space-x-4">
               <Link href="#" className="text-gray-400 hover:text-white transition-all duration-200 scale-on-hover" aria-label="Facebook">
