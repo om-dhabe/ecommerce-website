@@ -1,0 +1,14 @@
+{
+  "name": "ecommerce-mono",
+  "private": true,
+  "workspaces": [
+    "apps/web",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev": "concurrently -n web,api -c green,blue \"npm --workspace apps/web run dev\" \"npm --workspace apps/api run dev\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
